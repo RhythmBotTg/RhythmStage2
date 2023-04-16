@@ -36,8 +36,7 @@ async def searchNget(bot:Client,msg:Message) :
 
     result = YoutubeSearch(fltsearch, max_results=1).to_dict()[0]["url_suffix"]
     video_info = YoutubeDL().extract_info(url =f"https://youtube.com{result}",download=False)
-    inputfile = f"{video_info['title']}.wav"
-    filename = f"{video_info['title']}.mp3"
+    filename = f"{video_info['title']}"
     options={
             'format':'bestaudio/best',
             'keepvideo':False,
@@ -46,7 +45,8 @@ async def searchNget(bot:Client,msg:Message) :
 
     with YoutubeDL(options) as ydl:
         ydl.download([video_info['webpage_url']])
-    AudioSegment.from_wav(f"{inputfile}").export(f"{outputfile}", format="mp3")
-    await msg.reply_document(filename,quote=False)
+    AudioSegment.from_wav(f"{filename}").export(f"{filename}.mp3", format="mp3")
+    await msg.reply_document(f"{filename}.mp3",quote=False)
     await bot.delete_messages(chat_id,message_ids=message.id)
     os.remove(filename)
+    os.remove(f"{filename}.mp3")
