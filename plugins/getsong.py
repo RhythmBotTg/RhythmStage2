@@ -5,6 +5,7 @@ from time import sleep
 from yt_dlp import YoutubeDL
 from youtube_search import YoutubeSearch
 import spotipy
+from pydub import AudioSegment
 from pyrogram import Client
 from spotipy.oauth2 import SpotifyClientCredentials
 from pyrogram.types.messages_and_media import Message
@@ -35,6 +36,7 @@ async def searchNget(bot:Client,msg:Message) :
 
     result = YoutubeSearch(fltsearch, max_results=1).to_dict()[0]["url_suffix"]
     video_info = YoutubeDL().extract_info(url =f"https://youtube.com{result}",download=False)
+    inputfile = f"{video_info['title']}.wav"
     filename = f"{video_info['title']}.mp3"
     options={
             'format':'bestaudio/best',
@@ -44,7 +46,7 @@ async def searchNget(bot:Client,msg:Message) :
 
     with YoutubeDL(options) as ydl:
         ydl.download([video_info['webpage_url']])
-    #await bot.edit_message_text(chat_id,message_id=message.id)
+    AudioSegment.from_wav(f"{inputfile}").export(f"{outputfile}", format="mp3")
     await msg.reply_document(filename,quote=False)
     await bot.delete_messages(chat_id,message_ids=message.id)
     os.remove(filename)
